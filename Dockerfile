@@ -69,6 +69,7 @@ RUN git config --global url."https://github.com/".insteadOf "git@github.com:" &&
 COPY files/imu.cpp.modificado /root/ros2_ws/src/mavros/mavros/src/plugins/imu.cpp
 COPY files/ping360_files/ping360_node.cpp.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/src/ping360_node.cpp
 COPY files/gscam2_files/params.yaml.modificado /root/ros2_ws/src/gscam2/cfg/params.yaml
+COPY files/ping360_files/ping360_bringup.launch.py.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/launch/ping360_bringup.launch.py
     
 # -------------------------------------------------------- #
     
