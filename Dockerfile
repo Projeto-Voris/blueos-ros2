@@ -52,24 +52,24 @@ RUN cd /root/ \
     && python3 setup.py install --user
 
 # Install packages by source code
-COPY ros2_ws /root/ros2_ws
-WORKDIR /root/ros2_ws/src
-RUN git config --global url."https://github.com/".insteadOf "git@github.com:" && \
-    git clone --recurse-submodules https://github.com/JetSeaAI/ping360_sonar.git && \
-    git clone https://github.com/clydemcqueen/gscam2.git && \
-    git clone https://github.com/itskalvik/bluerobotics_sonar.git && \
-    git clone https://github.com/itskalvik/sonoptix_sonar.git && \
-    git clone https://github.com/Projeto-Voris/voris_bringup.git && \
-    git clone https://github.com/mavlink/mavros.git -b ros2 && \
-    cd mavros && git checkout e7a3e40e && cd ..
+# COPY ros2_ws /root/ros2_ws
+# WORKDIR /root/ros2_ws/src
+# RUN git config --global url."https://github.com/".insteadOf "git@github.com:" && \
+#     git clone --recurse-submodules https://github.com/JetSeaAI/ping360_sonar.git && \
+#     git clone https://github.com/clydemcqueen/gscam2.git && \
+#     git clone https://github.com/itskalvik/bluerobotics_sonar.git && \
+#     git clone https://github.com/itskalvik/sonoptix_sonar.git && \
+#     git clone https://github.com/Projeto-Voris/voris_bringup.git && \
+#     git clone https://github.com/mavlink/mavros.git -b ros2 && \
+#     cd mavros && git checkout e7a3e40e && cd ..
   
     
 # ----------- Changes on source code stay here ----------- #
     
-COPY files/imu.cpp.modificado /root/ros2_ws/src/mavros/mavros/src/plugins/imu.cpp
-COPY files/ping360_files/ping360_node.cpp.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/src/ping360_node.cpp
-COPY files/gscam2_files/params.yaml.modificado /root/ros2_ws/src/gscam2/cfg/params.yaml
-COPY files/ping360_files/ping360_bringup.launch.py.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/launch/ping360_bringup.launch.py
+# COPY files/imu.cpp.modificado /root/ros2_ws/src/mavros/mavros/src/plugins/imu.cpp
+# COPY files/ping360_files/ping360_node.cpp.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/src/ping360_node.cpp
+# COPY files/gscam2_files/params.yaml.modificado /root/ros2_ws/src/gscam2/cfg/params.yaml
+# COPY files/ping360_files/ping360_bringup.launch.py.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/launch/ping360_bringup.launch.py
     
 # -------------------------------------------------------- #
     

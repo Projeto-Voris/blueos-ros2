@@ -1,6 +1,6 @@
 [submodule "ros2_ws/src/mavros_control"]
 	path = ros2_ws/src/mavros_control
-	url = https://github.com/itskalvik/mavros_control
+	url = https://github.com/Projeto-Voris/mavros_control
 [submodule "ros2_ws/src/bluerobotics_sonar"]
 	path = ros2_ws/src/bluerobotics_sonar
 	url = https://github.com/itskalvik/bluerobotics_sonar
@@ -9,4 +9,13 @@
 	url = https://github.com/itskalvik/sonoptix_sonar
 [submodule "ros2_ws/src/gscam2"]
 	path = ros2_ws/src/gscam2
-	url = https://github.com/clydemcqueen/gscam2
+	url = https://github.com/Projeto-Voris/gscam2
+[submodule "ros2_ws/src/voris_bringup"]
+	path = ros2_ws/src/voris_bringup
+	url = https://github.com/Projeto-Voris/voris_bringup.git
+[submodule "ros2_ws/src/ping360_sonar"]
+	path = ros2_ws/src/ping360_sonar
+	url = https://github.com/Projeto-Voris/ping360_sonar.git
+[submodule "ros2_ws/src/mavros"]
+	path = ros2_ws/src/mavros
+	url = https://github.com/Projeto-Voris/mavros.git
