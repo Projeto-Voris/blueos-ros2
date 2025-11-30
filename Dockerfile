@@ -3,10 +3,10 @@ FROM ros:$ROS_DISTRO-ros-base
 ENV DEBIAN_FRONTEND=noninteractive PIP_BREAK_SYSTEM_PACKAGES=1
 WORKDIR /root/
 
-RUN echo "deb http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" > /etc/apt/sources.list && \
-    echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
-    echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
+# RUN echo "deb http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" > /etc/apt/sources.list && \
+#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
+#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
 
 # Install general packages (including foxglove)
 RUN rm /var/lib/dpkg/info/libc-bin.* \
@@ -14,11 +14,13 @@ RUN rm /var/lib/dpkg/info/libc-bin.* \
     && apt-get update \
     && apt-get install libc-bin \
     && apt-get install -q -y --no-install-recommends \
-    libboost-all-dev libasio-dev libgeographic-dev geographiclib-tools \
-    git tmux nano nginx wget netcat \
+    #  libasio-dev libgeographic-dev geographiclib-tools \
+    git tmux nano nginx wget libboost-all-dev\
+    # netcat \
     ros-${ROS_DISTRO}-geographic-msgs \
     ros-${ROS_DISTRO}-foxglove-bridge \
     ros-${ROS_DISTRO}-image-transport \
+    ros-${ROS_DISTRO}-compressed-image-transport \
     ros-${ROS_DISTRO}-angles \
     ros-${ROS_DISTRO}-diagnostic-updater \
     ros-${ROS_DISTRO}-eigen-stl-containers \
@@ -75,15 +77,21 @@ RUN cd /root/ \
     
 
 # Build ROS2 workspace with remaining packages
-WORKDIR /root/ros2_ws/
-RUN pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
+COPY ros2_ws /root/ros2_ws
+
+RUN cd /root/ros2_ws/ \
+    && pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
     && git clone https://github.com/ptrmu/ros2_shared.git --depth 1 src/ros2_shared \
-    && apt-get update \
-    && rosdep install --from-paths src --ignore-src -r -y \
+    && apt-get update 
+RUN cd /root/ros2_ws/ \
+    && rosdep install --from-paths src --ignore-src -r -y 
+RUN cd /root/ros2_ws/ \
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
-    && colcon build \
+    && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
     && . /root/ros2_ws/install/setup.sh \
-    && ros2 run mavros install_geographiclib_datasets.sh \
+    && ros2 run mavros install_geographiclib_datasets.sh 
+RUN cd /root/ros2_ws/ \
+    && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \

@@ -19,3 +19,5 @@
 [submodule "ros2_ws/src/mavros"]
 	path = ros2_ws/src/mavros
 	url = https://github.com/Projeto-Voris/mavros.git
+[submodule "ros2/src/ping360_sonar"]
+	url = https://github.com/JetSeaAI/ping-cpp.git

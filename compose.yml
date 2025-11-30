@@ -1,6 +1,6 @@
 services:
   ros2:
-    image: Projet-Voris/blueos-ros2:0.1.0
+    image: vorisufsc/blueos-ros2:0.0.1
     build:
       context: ./
       dockerfile: Dockerfile
