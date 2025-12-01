@@ -7,7 +7,7 @@ services:
       platforms:
         - "linux/amd64"
         - "linux/arm64"
-
+ 
     environment:
       - TERM=xterm-256color
       - XDG_RUNTIME_DIR

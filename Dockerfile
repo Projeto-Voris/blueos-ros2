@@ -3,11 +3,6 @@ FROM ros:$ROS_DISTRO-ros-base
 ENV DEBIAN_FRONTEND=noninteractive PIP_BREAK_SYSTEM_PACKAGES=1
 WORKDIR /root/
 
-# RUN echo "deb http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" > /etc/apt/sources.list && \
-#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
-#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
-#     echo "deb http://ports.ubuntu.com/ubuntu-ports jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
-
 # Install general packages (including foxglove)
 RUN rm /var/lib/dpkg/info/libc-bin.* \
     && apt-get clean \
@@ -53,28 +48,6 @@ RUN cd /root/ \
     && git checkout 3d41ddd \
     && python3 setup.py install --user
 
-# Install packages by source code
-# COPY ros2_ws /root/ros2_ws
-# WORKDIR /root/ros2_ws/src
-# RUN git config --global url."https://github.com/".insteadOf "git@github.com:" && \
-#     git clone --recurse-submodules https://github.com/JetSeaAI/ping360_sonar.git && \
-#     git clone https://github.com/clydemcqueen/gscam2.git && \
-#     git clone https://github.com/itskalvik/bluerobotics_sonar.git && \
-#     git clone https://github.com/itskalvik/sonoptix_sonar.git && \
-#     git clone https://github.com/Projeto-Voris/voris_bringup.git && \
-#     git clone https://github.com/mavlink/mavros.git -b ros2 && \
-#     cd mavros && git checkout e7a3e40e && cd ..
-  
-    
-# ----------- Changes on source code stay here ----------- #
-    
-# COPY files/imu.cpp.modificado /root/ros2_ws/src/mavros/mavros/src/plugins/imu.cpp
-# COPY files/ping360_files/ping360_node.cpp.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/src/ping360_node.cpp
-# COPY files/gscam2_files/params.yaml.modificado /root/ros2_ws/src/gscam2/cfg/params.yaml
-# COPY files/ping360_files/ping360_bringup.launch.py.modificado /root/ros2_ws/src/ping360_sonar/ping360_sonar/launch/ping360_bringup.launch.py
-    
-# -------------------------------------------------------- #
-    
 
 # Build ROS2 workspace with remaining packages
 COPY ros2_ws /root/ros2_ws
@@ -82,16 +55,14 @@ COPY ros2_ws /root/ros2_ws
 RUN cd /root/ros2_ws/ \
     && pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
     && git clone https://github.com/ptrmu/ros2_shared.git --depth 1 src/ros2_shared \
-    && apt-get update 
-RUN cd /root/ros2_ws/ \
+    && apt-get update \
     && rosdep install --from-paths src --ignore-src -r -y 
 RUN cd /root/ros2_ws/ \
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
-    && . /root/ros2_ws/install/setup.sh \
-    && ros2 run mavros install_geographiclib_datasets.sh 
-RUN cd /root/ros2_ws/ \
-    && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
+    && . "install/setup.sh" \
+    && ros2 run mavros install_geographiclib_datasets.sh \
+    && colcon build \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
@@ -112,7 +83,7 @@ COPY files/register_service /site/register_service
 COPY files/start.sh /start.sh
 
 # Add docker configuration
-LABEL version="1.0.5"
+LABEL version="0.0.1"
 LABEL permissions='{\
   "NetworkMode": "host",\
   "HostConfig": {\
