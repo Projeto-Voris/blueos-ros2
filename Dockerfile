@@ -11,7 +11,7 @@ RUN rm /var/lib/dpkg/info/libc-bin.* \
     && apt-get install -q -y --no-install-recommends \
     #  libasio-dev libgeographic-dev geographiclib-tools \
     git tmux nano nginx wget libboost-all-dev\
-    # netcat \
+    ros-${ROS_DISTRO}-mavros ros-${ROS_DISTRO}-mavros-extras ros-${ROS_DISTRO}-mavros-msgs \
     ros-${ROS_DISTRO}-geographic-msgs \
     ros-${ROS_DISTRO}-foxglove-bridge \
     ros-${ROS_DISTRO}-image-transport \
@@ -51,7 +51,7 @@ RUN cd /root/ \
 
 # Build ROS2 workspace with remaining packages
 COPY ros2_ws /root/ros2_ws
-
+RUN rm -rf /root/ros2_ws/src/mavros
 RUN cd /root/ros2_ws/ \
     && pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
     && git clone https://github.com/ptrmu/ros2_shared.git --depth 1 src/ros2_shared \
@@ -59,31 +59,40 @@ RUN cd /root/ros2_ws/ \
     && rosdep install --from-paths src --ignore-src -r -y 
 RUN cd /root/ros2_ws/ \
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
-    && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
-    && . "install/setup.sh" \
+    # && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
     && ros2 run mavros install_geographiclib_datasets.sh \
     && colcon build \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
     && echo "source /ros_entrypoint.sh" >> ~/.bashrc \
-    && echo "source /root/ros2_ws/install/setup.sh " >> ~/.bashrc
+    && echo "source /root/ros2_ws/install/setup.sh" >> ~/.bashrc \
+    && echo "source /opt/ros/${ROS_DISTRO};setup.sh" >> ~/.bashrc \
+    && echo "export ROS_DOMAIN_ID=3" >> ~/.bashrc
 
 # Setup ttyd for web terminal interface
+RUN apt-get update && apt-get install dos2unix -y
+
 ADD files/install-ttyd.sh /install-ttyd.sh
+RUN dos2unix /install-ttyd.sh
 RUN bash /install-ttyd.sh && rm /install-ttyd.sh
 
 # Copy configuration files
 COPY files/nginx.conf /etc/nginx/nginx.conf
 COPY files/index.html /usr/share/ttyd/index.html
+RUN dos2unix /etc/nginx/nginx.conf
+RUN dos2unix /usr/share/ttyd/index.html
 
 # Copy start script and other files
 RUN mkdir -p /site
 COPY files/register_service /site/register_service
 COPY files/start.sh /start.sh
+RUN dos2unix /site/register_service
+RUN dos2unix /start.sh
+
 
 # Add docker configuration
-LABEL version="0.0.1"
+LABEL version="0.1.0"
 LABEL permissions='{\
   "NetworkMode": "host",\
   "HostConfig": {\
@@ -115,7 +124,7 @@ LABEL company='{\
   "name": "VORIS / ItsKalvik",\
   "email": "projeto.voris@labmetro.ufsc.br"\
 }'
-LABEL readme="https://raw.githubusercontent.com/miguelslz/blueos-ros2/main/README.md"
+LABEL readme="https://raw.githubusercontent.com/Projeto-Voris/blueos-ros2/main/README.md"
 LABEL type="other"
 LABEL tags='[\
   "ros2",\

@@ -21,3 +21,9 @@
 	url = https://github.com/Projeto-Voris/mavros.git
 [submodule "ros2/src/ping360_sonar"]
 	url = https://github.com/JetSeaAI/ping-cpp.git
+[submodule "ros2_ws/src/dvl_msgs"]
+	path = ros2_ws/src/dvl_msgs
+	url = https://github.com/paagutie/dvl_msgs.git
+[submodule "ros2_ws/src/dvl-a50"]
+	path = ros2_ws/src/dvl-a50
+	url = https://github.com/Projeto-Voris/dvl-a50.git
