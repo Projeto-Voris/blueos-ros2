@@ -56,43 +56,45 @@ RUN cd /root/ros2_ws/ \
     && pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
     && git clone https://github.com/ptrmu/ros2_shared.git --depth 1 src/ros2_shared \
     && apt-get update \
-    && rosdep install --from-paths src --ignore-src -r -y 
+    && rosdep install --from-paths src --ignore-src -r -y \ 
+    && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
+    && ros2 run mavros install_geographiclib_datasets.sh 
+
 RUN cd /root/ros2_ws/ \
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     # && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
-    && ros2 run mavros install_geographiclib_datasets.sh \
     && colcon build \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/* \
     && echo "source /ros_entrypoint.sh" >> ~/.bashrc \
     && echo "source /root/ros2_ws/install/setup.sh" >> ~/.bashrc \
-    && echo "source /opt/ros/${ROS_DISTRO};setup.sh" >> ~/.bashrc \
+    && echo "source /opt/ros/${ROS_DISTRO}/setup.sh" >> ~/.bashrc \
     && echo "export ROS_DOMAIN_ID=3" >> ~/.bashrc
 
+    # RUN apt-get update && apt-get install dos2unix -y
+    
 # Setup ttyd for web terminal interface
-RUN apt-get update && apt-get install dos2unix -y
-
 ADD files/install-ttyd.sh /install-ttyd.sh
-RUN dos2unix /install-ttyd.sh
+# RUN dos2unix /install-ttyd.sh
 RUN bash /install-ttyd.sh && rm /install-ttyd.sh
 
 # Copy configuration files
 COPY files/nginx.conf /etc/nginx/nginx.conf
 COPY files/index.html /usr/share/ttyd/index.html
-RUN dos2unix /etc/nginx/nginx.conf
-RUN dos2unix /usr/share/ttyd/index.html
+# RUN dos2unix /etc/nginx/nginx.conf
+# RUN dos2unix /usr/share/ttyd/index.html
 
 # Copy start script and other files
 RUN mkdir -p /site
 COPY files/register_service /site/register_service
 COPY files/start.sh /start.sh
-RUN dos2unix /site/register_service
-RUN dos2unix /start.sh
+# RUN dos2unix /site/register_service
+# RUN dos2unix /start.sh
 
 
 # Add docker configuration
-LABEL version="0.1.0"
+LABEL version="0.1.2"
 LABEL permissions='{\
   "NetworkMode": "host",\
   "HostConfig": {\
