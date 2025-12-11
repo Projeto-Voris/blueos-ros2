@@ -70,8 +70,10 @@ RUN cd /root/ros2_ws/ \
     && echo "source /ros_entrypoint.sh" >> ~/.bashrc \
     && echo "source /root/ros2_ws/install/setup.sh" >> ~/.bashrc \
     && echo "source /opt/ros/${ROS_DISTRO}/setup.sh" >> ~/.bashrc \
-    && echo "export ROS_DOMAIN_ID=3" >> ~/.bashrc
-
+    && echo "export ROS_DOMAIN_ID=3" >> ~/.bashrc \
+    && echo "alias cw='cd /root/ros2_ws'" >> ~/.bashrc \
+    && echo "alias cs='cd /root/ros2_ws/src'" >> ~/.bashrc \
+    && echo "alias cb='cd /root/ros2_ws && colcon build'" >> ~/.bashrc
     # RUN apt-get update && apt-get install dos2unix -y
     
 # Setup ttyd for web terminal interface
