@@ -25,10 +25,6 @@ RUN rm /var/lib/dpkg/info/libc-bin.* \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pip3 and bluerobotics-ping
-RUN pip3 install --no-cache-dir setuptools -U \
-    && pip3 install --no-cache-dir bluerobotics-ping
-
 # Install gscam2 deps
 WORKDIR /root/
 RUN apt-get update \
@@ -41,28 +37,21 @@ RUN apt-get update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
     
-# Install ping-python from source (Newer commits don't seem to work with the ping1d)
-RUN cd /root/ \
-    && git clone https://github.com/bluerobotics/ping-python.git -b deployment \
-    && cd ping-python \
-    && git checkout 3d41ddd \
-    && python3 setup.py install --user
-
 
 # Build ROS2 workspace with remaining packages
 COPY ros2_ws /root/ros2_ws
 RUN rm -rf /root/ros2_ws/src/mavros
 RUN cd /root/ros2_ws/ \
     && pip3 install --no-cache-dir -r src/mavros_control/requirements.txt \
+    # && pip3 install --no-cache-dir -r src/sonar3d/src/sonar3d/sonar3d/api/requirements.txt \
     && git clone https://github.com/ptrmu/ros2_shared.git --depth 1 src/ros2_shared \
     && apt-get update \
-    && rosdep install --from-paths src --ignore-src -r -y \ 
+    && rosdep install --from-paths src --ignore-src -r -y --skip-keys nlohmann_json \ 
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
     && ros2 run mavros install_geographiclib_datasets.sh 
 
 RUN cd /root/ros2_ws/ \
     && . "/opt/ros/${ROS_DISTRO}/setup.sh" \
-    # && colcon build --packages-select libmavconn mavros_msgs mavros_extras mavros\
     && colcon build \
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -78,25 +67,22 @@ RUN cd /root/ros2_ws/ \
     
 # Setup ttyd for web terminal interface
 ADD files/install-ttyd.sh /install-ttyd.sh
-# RUN dos2unix /install-ttyd.sh
 RUN bash /install-ttyd.sh && rm /install-ttyd.sh
 
 # Copy configuration files
 COPY files/nginx.conf /etc/nginx/nginx.conf
 COPY files/index.html /usr/share/ttyd/index.html
-# RUN dos2unix /etc/nginx/nginx.conf
-# RUN dos2unix /usr/share/ttyd/index.html
+
 
 # Copy start script and other files
 RUN mkdir -p /site
 COPY files/register_service /site/register_service
 COPY files/start.sh /start.sh
-# RUN dos2unix /site/register_service
-# RUN dos2unix /start.sh
+
 
 
 # Add docker configuration
-LABEL version="0.1.2"
+LABEL version="0.2.1"
 LABEL permissions='{\
   "NetworkMode": "host",\
   "HostConfig": {\
